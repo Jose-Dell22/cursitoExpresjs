@@ -2,23 +2,97 @@
 	"info": {
 		"_postman_id": "6a326951-dbaf-4c8e-af2b-5fd64c2210e1",
 		"name": "Pruebas_expresjs",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "36478289"
 	},
 	"item": [
 		{
 			"name": "New Request",
 			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "Dell",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "jfdell41@gmail.com",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:3000/form"
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/users"
 			},
 			"response": []
 		},
 		{
 			"name": "New Request",
 			"request": {
-				"method": "GET",
-				"header": []
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n    \"id\": 4,\r\n    \"name\": \"Jofiwegjwepogjwpejgowjgwpegjpewjogpwe\",\r\n    \"email\": \"johnexample.com\"\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/users"
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 2,\r\n    \"name\": \"jose Dell\",\r\n    \"email\": \"Dell@example.com\"\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/users/2"
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:3000/users/1"
 			},
 			"response": []
 		},
