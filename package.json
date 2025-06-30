@@ -1,0 +1,28 @@
+{
+  "name": "expresjs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch app.js",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "expresjs"
+  ],
+  "author": "Jose Dell <jfdell41@gmail.com>",
+  "license": "MIT",
+  "description": "This course is so good fr",
+  "dependencies": {
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jose-Dell22/cursitoExpresjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Jose-Dell22/cursitoExpresjs/issues"
+  },
+  "homepage": "https://github.com/Jose-Dell22/cursitoExpresjs#readme"
+}
