@@ -10,14 +10,14 @@ const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('./generated/prisma');
 
 // 🔧 Custom Modules
-const LoggerMiddleware = require('./middlewares/logger');
-const errorHandler = require('./middlewares/errorHandler');
-const authenticateToken = require('./middlewares/auth');
+const LoggerMiddleware = require('./src/middlewares/logger');
+const errorHandler = require('./src/middlewares/errorHandler');
+const authenticateToken = require('./src/middlewares/auth');
 const {
   validateUser,
   validateUserUpdate,
   validateUpdatedId
-} = require('./utils/validation');
+} = require('./src/utils/validation');
 
 // 📂 Config
 const UsersFilePath = path.join(__dirname, 'users.json');
@@ -30,7 +30,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(LoggerMiddleware);
 
-// 📍 Routes
+// 🌐 Static files (para servir index.html)
+app.use(express.static('./src/public'));
+
+// 📍 Rutas de prueba
 app.get('/', (req, res) => {
   res.send(`
     <h1>express.js</h1>
@@ -67,7 +70,7 @@ app.post('/api/data', (req, res) => {
   res.status(201).json({ message: "JSON data received", data });
 });
 
-// 🧾 Users (JSON file based)
+// 🧾 Users (JSON file)
 app.get('/users', (req, res) => {
   fs.readFile(UsersFilePath, 'utf-8', (err, data) => {
     if (err) return res.status(500).json({ error: 'Error reading user data' });
@@ -136,12 +139,12 @@ app.delete('/users/:id', (req, res) => {
     users = users.filter(user => user.id !== userId);
     fs.writeFile(UsersFilePath, JSON.stringify(users, null, 2), err => {
       if (err) return res.status(500).json({ error: 'Could not delete user' });
-      res.status(204).send(); // No content
+      res.status(204).send();
     });
   });
 });
 
-// 🧪 Test error middleware
+// 🧪 Error middleware test
 app.get('/error', (req, res, next) => {
   next(new Error('error intencional'));
 });
@@ -181,17 +184,15 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ error: 'Error registering user' });
   }
 });
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user)
-    return res.status(400).json({ error: 'Invalid email or password' });
+  if (!user) return res.status(400).json({ error: 'Invalid email or password' });
 
   const validPassword = await bcrypt.compare(password, user.password);
-
-  if (!validPassword)
-    res.status(400).json({ error: 'Invalid email or password' });
+  if (!validPassword) return res.status(400).json({ error: 'Invalid email or password' });
 
   const token = jwt.sign(
     { id: user.id, role: user.role },
@@ -202,7 +203,7 @@ app.post('/login', async (req, res) => {
   res.json({ token });
 });
 
-// 🧹 Error handler (last)
+// 🧹 Error handler
 app.use(errorHandler);
 
 // 🚀 Start server

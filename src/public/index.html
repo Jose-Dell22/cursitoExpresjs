@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Express.js App</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+</head>
+<body class="bg-dark text-light">
+
+<div class="container mt-5">
+  <h1 class="text-center mb-4">🚀 Express.js API Tester</h1>
+
+  <!-- 🧍 Register Form -->
+  <div class="card bg-secondary mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Register User</h5>
+      <form id="registerForm">
+        <input type="text" class="form-control mb-2" placeholder="Name" name="name" required />
+        <input type="email" class="form-control mb-2" placeholder="Email" name="email" required />
+        <input type="password" class="form-control mb-2" placeholder="Password" name="password" required />
+        <button class="btn btn-success">Register</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 🔐 Login Form -->
+  <div class="card bg-secondary mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Login</h5>
+      <form id="loginForm">
+        <input type="email" class="form-control mb-2" placeholder="Email" name="email" required />
+        <input type="password" class="form-control mb-2" placeholder="Password" name="password" required />
+        <button class="btn btn-primary">Login</button>
+      </form>
+      <p id="token" class="mt-2 small text-warning"></p>
+    </div>
+  </div>
+
+  <!-- 🔒 Protected Route -->
+  <div class="card bg-secondary">
+    <div class="card-body">
+      <h5 class="card-title">Access Protected Route</h5>
+      <button id="accessProtected" class="btn btn-warning">Access</button>
+      <p id="protectedResult" class="mt-2"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = "http://localhost:3000";
+  let jwtToken = "";
+
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const body = Object.fromEntries(form.entries());
+
+    const res = await fetch(`${API}/register`, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    alert(JSON.stringify(data));
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const body = Object.fromEntries(form.entries());
+
+    const res = await fetch(`${API}/login`, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    jwtToken = data.token;
+    document.getElementById('token').innerText = `Token: ${jwtToken}`;
+  });
+
+  document.getElementById('accessProtected').addEventListener('click', async () => {
+    const res = await fetch(`${API}/protected-route`, {
+      headers: { Authorization: `Bearer ${jwtToken}` }
+    });
+    const text = await res.text();
+    document.getElementById('protectedResult').innerText = text;
+  });
+</script>
+
+</body>
+</html>
