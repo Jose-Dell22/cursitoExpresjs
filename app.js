@@ -1,28 +1,35 @@
+// 🌐 Core Modules
+const fs = require('fs');
+const path = require('path');
+
+// 📦 External Packages
 require('dotenv').config();
 const express = require('express');
 const bodyparser = require('body-parser');
-const fs = require('fs');
-const path = require('path');
+const { PrismaClient } = require('./generated/prisma');
+
+// 🔧 Custom Modules
+const LoggerMiddleware = require('./middlewares/logger');
+const errorHandler = require('./middlewares/errorHandler');
 const {
     validateUser,
     validateUserUpdate,
     validateUpdatedId
 } = require('./utils/validation');
-const { error } = require('console');
-const LoggerMiddleware = require('./middlewares/logger');
-const errorHandler = require('./middlewares/errorHandler');
 
+// 📂 Config
 const UsersFilePath = path.join(__dirname, 'users.json');
-
+const prisma = new PrismaClient();
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+// 🧩 Middleware
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(LoggerMiddleware);
 app.use(errorHandler);
 
-
-const PORT = process.env.PORT || 3000;
-
+// 📍 Routes
 app.get('/', (req, res) => {
     res.send(`
         <h1>express.js</h1>
@@ -66,6 +73,7 @@ app.post('/api/data', (req, res) => {
     });
 });
 
+// 🧾 Users (JSON file based)
 app.get('/users', (req, res) => {
     fs.readFile(UsersFilePath, 'utf-8', (err, data) => {
         if (err) {
@@ -129,6 +137,7 @@ app.put('/users/:id', (req, res) => {
         });
     });
 });
+
 app.delete('/users/:id', (req, res) => {
     const userId = parseInt(req.params.id, 10);
 
@@ -155,9 +164,22 @@ app.delete('/users/:id', (req, res) => {
     });
 });
 
-app.get('/error' , (req,res,next)=>{
-next(new Error('error intencional'));
+// 🧪 Test error middleware
+app.get('/error', (req, res, next) => {
+    next(new Error('error intencional'));
 });
+
+// 🗃️ DB Users (PostgreSQL + Prisma)
+app.get('/db-users', async (req, res) => {
+    try {
+        const users = await prisma.user.findMany();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ error: 'Error communicating with database' });
+    }
+});
+
+// 🚀 Start server
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
 });
