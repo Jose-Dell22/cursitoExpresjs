@@ -9,12 +9,17 @@ const {
     validateUpdatedId
 } = require('./utils/validation');
 const { error } = require('console');
+const LoggerMiddleware = require('./middlewares/logger');
+const errorHandler = require('./middlewares/errorHandler');
 
 const UsersFilePath = path.join(__dirname, 'users.json');
 
 const app = express();
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
+app.use(LoggerMiddleware);
+app.use(errorHandler);
+
 
 const PORT = process.env.PORT || 3000;
 
@@ -150,6 +155,9 @@ app.delete('/users/:id', (req, res) => {
     });
 });
 
+app.get('/error' , (req,res,next)=>{
+next(new Error('error intencional'));
+});
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
 });

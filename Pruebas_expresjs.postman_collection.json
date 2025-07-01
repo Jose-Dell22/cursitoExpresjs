@@ -103,6 +103,22 @@
 				"header": []
 			},
 			"response": []
+		},
+		{
+			"name": "Error request",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n    \"id\": 4,\r\n    \"name\": \"Jofiwegjwepogjwpejgowjgwpegjpewjogpwe\",\r\n    \"email\": \"johnexample.com\"\r\n  }"
+				},
+				"url": "http://localhost:3000/error"
+			},
+			"response": []
 		}
 	]
 }
