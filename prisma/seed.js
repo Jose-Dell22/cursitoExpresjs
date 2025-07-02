@@ -1,71 +1,68 @@
-// Import Prisma Client
-const { PrismaClient } = require('../generated/prisma');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  // 1. Delete all users
-  await prisma.user.deleteMany();
-  console.log(' All users deleted');
+  // Crear usuarios con upsert
+  const user1 = await prisma.user.upsert({
+    where: { email: 'user1@example.com' },
+    update: {},
+    create: {
+      email: 'user1@example.com',
+      password: 'password123',
+      name: 'User One',
+      role: 'USER'
+    }
+  });
 
-  // 2. Create sample users
-  const createdUsers = await Promise.all([
-    prisma.user.create({
-      data: {
-        name: 'Alice Johnson',
-        email: 'alice@example.com',
-        password: 'alice123',
-        role: 'ADMIN'
-      }
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Bob Smith',
-        email: 'bob@example.com',
-        password: 'bob123',
-        role: 'USER'
-      }
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Charlie Lee',
-        email: 'charlie@example.com',
-        password: 'charlie123',
-        role: 'USER'
-      }
-    })
-  ]);
-  console.log(' Sample users created:', createdUsers);
-
-  // 3. Read all users
-  const allUsers = await prisma.user.findMany();
-  console.log(' All users:', allUsers);
-
-  // 4. Update one user’s name and role (e.g., Bob to "Robert Smith", role to ADMIN)
-  const bob = allUsers.find(u => u.email === 'bob@example.com');
-  const updatedUser = await prisma.user.update({
-    where: { id: bob.id },
-    data: {
-      name: 'Robert Smith',
+  const user2 = await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {},
+    create: {
+      email: 'admin@example.com',
+      password: 'admin123',
+      name: 'Admin User',
       role: 'ADMIN'
     }
   });
-  console.log(' Updated user:', updatedUser);
 
-  // 5. Delete one user by ID (e.g., Charlie)
-  const charlie = allUsers.find(u => u.email === 'charlie@example.com');
-  const deletedUser = await prisma.user.delete({
-    where: { id: charlie.id }
+  // Crear bloques de tiempo (sin duplicar)
+  const timeBlock1 = await prisma.timeBlock.create({
+    data: {
+      startTime: new Date('2023-10-01T09:00:00Z'),
+      endTime: new Date('2023-10-01T10:00:00Z')
+    }
   });
-  console.log(' Deleted user:', deletedUser);
 
-  // 6. Final list of users
-  const finalUsers = await prisma.user.findMany();
-  console.log(' Remaining users:', finalUsers);
+  const timeBlock2 = await prisma.timeBlock.create({
+    data: {
+      startTime: new Date('2023-10-01T10:00:00Z'),
+      endTime: new Date('2023-10-01T11:00:00Z')
+    }
+  });
+
+  // Crear citas
+  await prisma.appointment.create({
+    data: {
+      date: new Date('2023-10-01T09:00:00Z'),
+      user: { connect: { id: user1.id } },
+      timeBlock: { connect: { id: timeBlock1.id } }
+    }
+  });
+
+  await prisma.appointment.create({
+    data: {
+      date: new Date('2023-10-01T10:00:00Z'),
+      user: { connect: { id: user2.id } },
+      timeBlock: { connect: { id: timeBlock2.id } }
+    }
+  });
+
+  console.log('✅ Seed ejecutado correctamente.');
 }
 
 main()
-  .catch((e) => {
-    console.error(' Error:', e);
+  .catch(e => {
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {

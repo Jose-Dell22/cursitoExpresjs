@@ -4,8 +4,10 @@ const app = express();
 
 app.use(express.json());
 
+// Rutas API
 app.use('/api', routes);
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
+// Archivos estáticos: si visitas '/', servirá 'public/index.html'
+app.use(express.static('./public'));
+
+module.exports = app;
